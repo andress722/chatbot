@@ -1,15 +1,14 @@
 from flask import Flask, request
-import requests
 import os
+import requests
 
 app = Flask(__name__)
-
 VERIFY_TOKEN = "meutoken123"
-PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")  # ou coloque direto entre aspas
+PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
-    return 'Servidor Flask rodando no Render!'
+    return 'Bot online'
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -20,29 +19,26 @@ def webhook():
             return str(challenge), 200
         return 'Token inválido', 403
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
         data = request.get_json()
+        print(data)  # ADICIONE ISSO PRA VER OS POSTS!
         for entry in data.get('entry', []):
             for messaging_event in entry.get('messaging', []):
+                sender_id = messaging_event['sender']['id']
                 if 'message' in messaging_event:
-                    sender_id = messaging_event['sender']['id']
-                    message_text = messaging_event['message'].get('text')
-                    if message_text:
-                        resposta = f"Você disse: {message_text}"
-                        send_message(sender_id, resposta)
+                    text = messaging_event['message'].get('text')
+                    send_message(sender_id, f"Você disse: {text}")
         return "ok", 200
 
-def send_message(recipient_id, message_text):
-    url = "https://graph.facebook.com/v18.0/me/messages"
-    params = {"access_token": PAGE_ACCESS_TOKEN}
-    headers = {"Content-Type": "application/json"}
+def send_message(recipient_id, message):
     payload = {
-        "recipient": {"id": recipient_id},
-        "message": {"text": message_text}
+        'recipient': {'id': recipient_id},
+        'message': {'text': message}
     }
-
-    r = requests.post(url, params=params, headers=headers, json=payload)
-    print("Resposta do envio:", r.status_code, r.text)
+    auth = {'access_token': PAGE_ACCESS_TOKEN}
+    requests.post('https://graph.facebook.com/v18.0/me/messages',
+                  params=auth, json=payload)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
