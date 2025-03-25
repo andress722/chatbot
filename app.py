@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Substitua pelo seu token da página do Facebook
-PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", "COLOQUE_SEU_TOKEN_AQUI")
+PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", "EAAJAK6Q1UyMBO4DAzUmGgLMHVgQxxune9POcuyZB8YQDzOS0wOHdpOjBHd78z7EsEgfh3xHVhQ2yKxzDGgK5xjSaMVdjaYrp2D50TxvzvhXWwoCPIeLx3pAKqnfNCsZCxCtOCZCnlIVy7LZBEhrwDvfZAObczOsQ73koxdBoCByonrutlDYbcwrRSeM6WV73YHwZDZD")
 VERIFY_TOKEN = "meutoken123"
 
 @app.route('/')
